@@ -27,7 +27,14 @@ function paintToCanvas() {
   canvas.height = height;
 
   return setInterval(() => {
-    ctx.drawImage(video, 0, 0, width, height) // the 0, 0 are the coordinates for starting at the top left hand of the video
+    ctx.drawImage(video, 0, 0, width, height); // the 0, 0 are the coordinates for starting at the top left hand of the video
+    //take the pixels out
+    let pixels = ctx.getImageData(0, 0, width, height);
+    // mess with the pixels (in this case, the rgb values)
+    pixels = redEffect(pixels);
+    // put the pixels back after messing with them
+    ctx.putImageData(pixels, 0, 0);
+
   }, 16);
 }
 
@@ -45,10 +52,22 @@ function takePhoto() {
   link.href = data;
   link.setAttribute('download', 'Webcam-app Photo');
   // link text content
-  link.textContent = 'Download Image';
+  // link.textContent = 'Download Image';
+  
   // Instead of having the text content, you can make the source the image and have the image show up along with a caption for the photo
   link.innerHTML = `<img src="${data}" alt="Webcam-app Photo" />`;
   strip.insertBefore(link, strip.firstChild);
+}
+
+
+//function that messes with the rgb values 
+function redEffect(pixels) {
+  for(let i = 0; i < pixels.data.length; i+=4) {
+     pixels.data[i] = pixels.data[i] + 200; // red from rgb
+     pixels.data[i + 1] = pixels.data[i + 1] - 100; // green from rgb
+     pixels.data [i + 2] = pixels.data [i + 2] * 0.5; // blue from rgb
+  }
+  return pixels;
 }
 
 getVideo();
